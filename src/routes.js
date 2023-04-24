@@ -16,8 +16,8 @@ export const routes = [
                 title: search
             } : null)
 
-            if (!tasks) {
-                return res.writeHead(401).end("Sem tasks.")
+            if (!tasks.length) {
+                return res.writeHead(401).end(JSON.stringify({ message: "No tasks" }))
             }
 
             return res.writeHead(200).end(JSON.stringify(tasks))
@@ -29,8 +29,12 @@ export const routes = [
         handler: (req, res) => {
             const { title, description } = req.body
 
-            if (!title || !description) {
-                return res.writeHead(401).end("Necessário conter campos title e description.")
+            if (!title) {
+                return res.writeHead(401).end(JSON.stringify({ message: "Field title is required" }))
+            }
+
+            if (!description) {
+                return res.writeHead(401).end(JSON.stringify({ message: "Field description is required" }))
             }
 
             const task = {
@@ -44,7 +48,7 @@ export const routes = [
 
             database.insert('tasks', task)
 
-            return res.writeHead(201).end(`Task criada com id ${task.id}`)
+            return res.writeHead(201).end(JSON.stringify({ message: `Task created with id ${task.id}` }))
         }
     },
     {
@@ -55,11 +59,15 @@ export const routes = [
             const { title, description } = req.body
 
             if (!database.validateId('tasks', id)) {
-                return res.writeHead(401).end(`Id ${id} não encontrado.`)
+                return res.writeHead(401).end(JSON.stringify({ message: `Id ${id} not found` }))
             }
 
-            if (!title || !description) {
-                return res.writeHead(401).end("Necessário conter campos title e description.")
+            if (!title) {
+                return res.writeHead(401).end(JSON.stringify({ message: "Field title is required" }))
+            }
+            
+            if (!description) {
+                return res.writeHead(401).end(JSON.stringify({ message: "Field description is required" }))
             }
 
             database.update('tasks', id, {
@@ -68,7 +76,7 @@ export const routes = [
                 updated_at: new Date(),
             })
 
-            return res.writeHead(204).end(`Task com id ${id} foi alterada.`)
+            return res.writeHead(200).end(JSON.stringify({ message: `Task with id ${id} updated` }))
         }
     },
     {
@@ -78,12 +86,12 @@ export const routes = [
             const { id } = req.params
 
             if (!database.validateId('tasks', id)) {
-                return res.writeHead(401).end(`Id ${id} não encontrado.`)
+                return res.writeHead(401).end(JSON.stringify({ message: `Id ${id} not found` }))
             }
 
             database.delete('tasks', id)
 
-            return res.writeHead(204).end(`Task com id ${id} foi deletada.`)
+            return res.writeHead(200).end(JSON.stringify({ message: `Task with id ${id} deleted` }))
         }
     },
     {
@@ -93,7 +101,7 @@ export const routes = [
             const { id } = req.params
 
             if (!database.validateId('tasks', id)) {
-                return res.writeHead(401).end(`Id ${id} não encontrado.`)
+                return res.writeHead(401).end(JSON.stringify({ message: `Id ${id} not found` }))
             }
 
             database.update('tasks', id, {
@@ -101,7 +109,7 @@ export const routes = [
                 updated_at: new Date(),
             })
 
-            return res.writeHead(204).end(`Task com id ${id} foi marcada como completa.`)
+            return res.writeHead(200).end(JSON.stringify({ message: `Task with id ${id} marked as completed` }))
         }
     }
 ]
